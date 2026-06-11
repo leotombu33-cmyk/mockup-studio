@@ -22,4 +22,4 @@ STORAGE_ENDPOINT = os.getenv("STORAGE_ENDPOINT", "")  # ex: https://<id>.r2.clou
 LOCAL_STORAGE_DIR = Path(os.getenv("LOCAL_STORAGE_DIR", Path(__file__).parent / "storage_data"))
 
 MAX_FILE_SIZE = 25 * 1024 * 1024  # 25 Mo
-ALLOWED_MIME_TYPES = {"image/png", "image/jpeg", "image/webp"}
+ALLOWED_MIME_TYPES = {"image/png", "image/jpeg", "image/webp", "application/pdf"}

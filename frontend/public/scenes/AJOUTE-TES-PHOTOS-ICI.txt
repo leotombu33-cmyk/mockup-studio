@@ -1,0 +1,15 @@
+Place ici 4 photos générées par ton app (une par scène) :
+
+  evjf.jpg      — mockup généré avec la scène Soirée EVJF
+  wine.jpg      — mockup généré avec la scène Dégustation vin
+  wedding.jpg   — mockup généré avec la scène Table de mariage
+  gift.jpg      — mockup généré avec la scène Boîte cadeau
+
+Comment faire :
+1. Génère un mockup par scène avec un joli design.
+2. Télécharge-les, renomme-les exactement comme ci-dessus.
+3. Upload-les sur GitHub dans frontend/public/scenes/
+4. Render redéploie tout seul → le site affiche tes vraies photos.
+
+Tant que ces fichiers n'existent pas, le site affiche des dégradés
+de couleur à la place (aucune image cassée).

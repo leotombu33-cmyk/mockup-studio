@@ -2,6 +2,7 @@ import { motion, useReducedMotion } from 'framer-motion'
 import { Sparkles } from 'lucide-react'
 import { useI18n } from '../lib/i18n.jsx'
 import { SCENE_BY_ID } from '../lib/scenes.js'
+import SceneVisual from './SceneVisual.jsx'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -16,19 +17,29 @@ function MoodCard({ sceneId, caption, rotation, delay, reduced }) {
   const scene = SCENE_BY_ID[sceneId]
   return (
     <motion.figure
-      initial={reduced ? false : { opacity: 0, y: 32, rotate: 0 }}
-      animate={{ opacity: 1, y: 0, rotate: rotation }}
-      transition={{ duration: 0.8, delay, ease: [0.22, 1, 0.36, 1] }}
-      whileHover={reduced ? undefined : { y: -8, transition: { duration: 0.3 } }}
-      className="w-36 shrink-0 rounded-card bg-paper p-2 pb-3 shadow-lift sm:w-44"
-      style={{ rotate: rotation }}
+      initial={reduced ? false : { opacity: 0, y: 60, rotate: rotation * 2.5, scale: 0.9 }}
+      animate={{
+        opacity: 1,
+        y: [0, -7, 0],
+        rotate: rotation,
+        scale: 1,
+        transition: {
+          opacity: { duration: 0.7, delay },
+          rotate: { type: 'spring', stiffness: 60, damping: 12, delay },
+          scale: { duration: 0.7, delay },
+          y: reduced
+            ? { duration: 0 }
+            : { duration: 5.5, delay: delay + 1, repeat: Infinity, ease: 'easeInOut' },
+        },
+      }}
+      whileHover={
+        reduced ? undefined : { scale: 1.05, rotate: 0, zIndex: 10, transition: { duration: 0.35 } }
+      }
+      className="group w-36 shrink-0 cursor-default rounded-card bg-paper p-2 pb-3 shadow-lift sm:w-44"
     >
-      <div
-        className="flex aspect-[3/4] items-end justify-start rounded-xl p-3 text-2xl"
-        style={{ backgroundImage: scene.gradient }}
-      >
-        <span aria-hidden="true">{scene.emoji}</span>
-      </div>
+      <SceneVisual scene={scene} className="flex aspect-[3/4] items-end justify-start rounded-xl p-3 text-2xl">
+        <span className="relative" aria-hidden="true">{scene.emoji}</span>
+      </SceneVisual>
       <figcaption className="mt-2 px-1 font-display text-sm italic text-mute">
         {caption}
       </figcaption>

@@ -1,10 +1,10 @@
 import { useRef, useState } from 'react'
 import { motion } from 'framer-motion'
-import { ImageUp } from 'lucide-react'
+import { FileText, ImageUp } from 'lucide-react'
 import { toast } from 'sonner'
 import { useI18n } from '../lib/i18n.jsx'
 
-const ACCEPTED = ['image/png', 'image/jpeg', 'image/webp']
+const ACCEPTED = ['image/png', 'image/jpeg', 'image/webp', 'application/pdf']
 const MAX_SIZE = 25 * 1024 * 1024
 
 export default function UploadZone({ file, onFile }) {
@@ -24,7 +24,7 @@ export default function UploadZone({ file, onFile }) {
       return
     }
     if (preview) URL.revokeObjectURL(preview)
-    setPreview(URL.createObjectURL(candidate))
+    setPreview(candidate.type === 'application/pdf' ? null : URL.createObjectURL(candidate))
     onFile(candidate)
   }
 
@@ -57,13 +57,19 @@ export default function UploadZone({ file, onFile }) {
         onChange={(e) => accept(e.target.files?.[0])}
       />
 
-      {file && preview ? (
+      {file ? (
         <div className="flex items-center gap-5">
-          <img
-            src={preview}
-            alt=""
-            className="h-24 w-24 rounded-xl border border-veil object-cover"
-          />
+          {preview ? (
+            <img
+              src={preview}
+              alt=""
+              className="h-24 w-24 rounded-xl border border-veil object-cover"
+            />
+          ) : (
+            <span className="flex h-24 w-24 items-center justify-center rounded-xl border border-veil bg-sand text-brand">
+              <FileText className="h-8 w-8" aria-hidden="true" />
+            </span>
+          )}
           <div className="min-w-0">
             <p className="truncate font-medium" data-testid="upload-filename">
               {file.name}

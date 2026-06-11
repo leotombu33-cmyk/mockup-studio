@@ -33,6 +33,24 @@ app.add_middleware(
 EXTENSIONS = {"image/png": "png", "image/jpeg": "jpg", "image/webp": "webp"}
 
 
+def pdf_to_png(pdf_bytes: bytes) -> bytes:
+    """Convertit la première page d'un PDF en PNG haute résolution."""
+    import io
+
+    import pypdfium2 as pdfium
+
+    document = pdfium.PdfDocument(pdf_bytes)
+    try:
+        page = document[0]
+        bitmap = page.render(scale=2.0)  # ~150-200 dpi, largement assez pour Gemini
+        image = bitmap.to_pil()
+        buffer = io.BytesIO()
+        image.save(buffer, format="PNG")
+        return buffer.getvalue()
+    finally:
+        document.close()
+
+
 def serialize(doc: dict) -> dict:
     return {
         "id": doc["id"],
@@ -68,15 +86,23 @@ async def generate(file: UploadFile = File(...), scene_id: str = Form(...)):
     if not image_bytes:
         raise HTTPException(status_code=400, detail="empty_file")
 
+    content_type = file.content_type
+    if content_type == "application/pdf":
+        try:
+            image_bytes = pdf_to_png(image_bytes)
+        except Exception as exc:
+            raise HTTPException(status_code=400, detail="invalid_pdf") from exc
+        content_type = "image/png"
+
     mockup_id = str(uuid.uuid4())
-    extension = EXTENSIONS[file.content_type]
+    extension = EXTENSIONS[content_type]
     design_path = f"designs/{mockup_id}.{extension}"
     mockup_path = f"mockups/{mockup_id}.png"
 
     await storage.save(design_path, image_bytes)
 
     try:
-        mockup_bytes = await generate_mockup(image_bytes, file.content_type, scene["prompt"])
+        mockup_bytes = await generate_mockup(image_bytes, content_type, scene["prompt"])
     except GeminiError as exc:
         raise HTTPException(status_code=502, detail=f"generation_failed: {exc}") from exc
 

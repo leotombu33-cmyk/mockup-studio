@@ -2,6 +2,7 @@ import { motion, useReducedMotion } from 'framer-motion'
 import { Check } from 'lucide-react'
 import { useI18n } from '../lib/i18n.jsx'
 import { SCENES } from '../lib/scenes.js'
+import SceneVisual from './SceneVisual.jsx'
 
 const container = {
   hidden: {},
@@ -9,8 +10,8 @@ const container = {
 }
 
 const item = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } },
+  hidden: { opacity: 0, y: 32, scale: 0.96 },
+  show: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } },
 }
 
 export default function SceneSelector({ selected, onSelect }) {
@@ -38,18 +39,16 @@ export default function SceneSelector({ selected, onSelect }) {
             role="radio"
             aria-checked={active}
             onClick={() => onSelect(scene.id)}
-            whileHover={reduced ? undefined : { y: -4 }}
+            whileHover={reduced ? undefined : { y: -6, scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             transition={{ duration: 0.25 }}
-            className={`relative overflow-hidden rounded-card bg-paper p-2 pb-3 text-left shadow-soft transition-shadow duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand ${
+            className={`group relative overflow-hidden rounded-card bg-paper p-2 pb-3 text-left shadow-soft transition-shadow duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand ${
               active ? 'ring-2 ring-brand shadow-lift' : 'hover:shadow-lift'
             }`}
           >
-            <div
-              className="flex aspect-[4/3] items-end rounded-xl p-3 text-xl"
-              style={{ backgroundImage: scene.gradient }}
-            >
-              <span aria-hidden="true">{scene.emoji}</span>
-            </div>
+            <SceneVisual scene={scene} className="flex aspect-[4/3] items-end rounded-xl p-3 text-xl">
+              <span className="relative" aria-hidden="true">{scene.emoji}</span>
+            </SceneVisual>
             <div className="px-1.5 pt-2.5">
               <p className="font-display text-base leading-snug">
                 {t(`scene.${scene.id}.title`)}
