@@ -1,0 +1,14 @@
+# Blueprint Render — détecté automatiquement à la création du service.
+services:
+  - type: web
+    name: mockup-studio
+    runtime: docker
+    plan: free
+    healthCheckPath: /api/scenes
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false          # à renseigner dans le dashboard Render
+      - key: MONGO_URL
+        sync: false          # à renseigner dans le dashboard Render
+      - key: DB_NAME
+        value: mockup_studio
