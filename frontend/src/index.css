@@ -19,3 +19,24 @@ body {
     scroll-behavior: auto;
   }
 }
+
+/* ─── Marquee éditorial ─────────────────────────────── */
+@keyframes marquee-scroll {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee-rail {
+  animation: marquee-scroll 32s linear infinite;
+}
+
+.marquee-rail:hover {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-rail {
+    animation: none;
+  }
+}

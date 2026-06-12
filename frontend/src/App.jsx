@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 
 import Header from './components/Header.jsx'
 import Hero from './components/Hero.jsx'
+import Marquee from './components/Marquee.jsx'
 import UploadZone from './components/UploadZone.jsx'
 import SceneSelector from './components/SceneSelector.jsx'
 import DarkroomLoader from './components/DarkroomLoader.jsx'
@@ -69,6 +70,8 @@ export default function App() {
       <Header />
       <main>
         <Hero />
+
+        <Marquee />
 
         <section id="studio" className="mx-auto max-w-6xl scroll-mt-24 px-6 pb-24">
           <motion.div

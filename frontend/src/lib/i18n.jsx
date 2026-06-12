@@ -51,6 +51,10 @@ const dictionaries = {
     'gallery.download': 'Télécharger',
     'gallery.delete': 'Supprimer',
     'gallery.deleted': 'Mockup supprimé.',
+    'marquee.1': 'Photos en 15 secondes',
+    'marquee.2': 'HD sans filigrane',
+    'marquee.3': 'Prêt pour Etsy',
+    'marquee.4': 'Compositing photoréaliste',
     'footer.tagline': 'Des photos produit dignes d’un magazine, sans studio.',
   },
   en: {
@@ -103,6 +107,10 @@ const dictionaries = {
     'gallery.download': 'Download',
     'gallery.delete': 'Delete',
     'gallery.deleted': 'Mockup deleted.',
+    'marquee.1': 'Photos in 15 seconds',
+    'marquee.2': 'HD, no watermark',
+    'marquee.3': 'Etsy-ready',
+    'marquee.4': 'Photorealistic compositing',
     'footer.tagline': 'Magazine-grade product photos, no studio required.',
   },
 }
