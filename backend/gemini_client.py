@@ -1,7 +1,7 @@
-"""Appel à Gemini "Nano Banana" (gemini-2.5-flash-image) en image-to-image.
+"""Appel a Gemini "Nano Banana" (gemini-2.5-flash-image) en image-to-image.
 
-On envoie le design uploadé + le prompt de mise en scène, Gemini renvoie
-le mockup photoréaliste en base64.
+On envoie le design uploade + le prompt de mise en scene, Gemini renvoie
+le mockup photorealiste en base64.
 """
 import base64
 
@@ -16,13 +16,19 @@ GEMINI_URL = (
 
 
 class GeminiError(Exception):
-    """Levée quand Gemini échoue ou ne renvoie pas d'image."""
+    """Levee quand Gemini echoue ou ne renvoie pas d'image."""
+
+
+def _fail(message: str) -> "GeminiError":
+    # Trace visible dans les logs Render pour diagnostiquer facilement.
+    print(f"[gemini] ERREUR : {message}", flush=True)
+    return GeminiError(message)
 
 
 async def generate_mockup(image_bytes: bytes, mime_type: str, prompt: str) -> bytes:
-    """Compose le design dans la scène demandée. Renvoie les bytes PNG du mockup."""
+    """Compose le design dans la scene demandee. Renvoie les bytes PNG du mockup."""
     if not config.GEMINI_API_KEY:
-        raise GeminiError("GEMINI_API_KEY manquante — renseignez le fichier .env")
+        raise _fail("GEMINI_API_KEY manquante — renseignez la variable d'environnement")
 
     payload = {
         "contents": [
@@ -38,7 +44,8 @@ async def generate_mockup(image_bytes: bytes, mime_type: str, prompt: str) -> by
                 ]
             }
         ],
-        "generationConfig": {"responseModalities": ["IMAGE"]},
+        # Ce modele exige d'accepter TEXT et IMAGE (IMAGE seul -> erreur 400).
+        "generationConfig": {"responseModalities": ["TEXT", "IMAGE"]},
     }
 
     async with httpx.AsyncClient(timeout=120) as client:
@@ -49,16 +56,22 @@ async def generate_mockup(image_bytes: bytes, mime_type: str, prompt: str) -> by
         )
 
     if response.status_code != 200:
-        raise GeminiError(f"Gemini a répondu {response.status_code} : {response.text[:300]}")
+        raise _fail(
+            f"Gemini a repondu {response.status_code} : {response.text[:500]}"
+        )
 
-    try:
-        parts = response.json()["candidates"][0]["content"]["parts"]
-    except (KeyError, IndexError) as exc:
-        raise GeminiError("Réponse Gemini inattendue (pas de candidats)") from exc
+    body = response.json()
+    candidates = body.get("candidates") or []
+    if not candidates:
+        raise _fail(f"Reponse Gemini sans candidats : {str(body)[:500]}")
 
+    parts = (candidates[0].get("content") or {}).get("parts") or []
     for part in parts:
         inline = part.get("inlineData") or part.get("inline_data")
         if inline and inline.get("data"):
             return base64.b64decode(inline["data"])
 
-    raise GeminiError("Gemini n'a pas renvoyé d'image pour cette requête")
+    finish = candidates[0].get("finishReason", "inconnu")
+    raise _fail(
+        f"Gemini n'a pas renvoye d'image (finishReason={finish}) : {str(parts)[:300]}"
+    )
