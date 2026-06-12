@@ -1,0 +1,9 @@
+fastapi>=0.111
+uvicorn[standard]>=0.30
+motor>=3.4
+python-multipart>=0.0.9
+httpx>=0.27
+python-dotenv>=1.0
+boto3>=1.34  # uniquement si storage S3/R2 — inutile en mode local
+pypdfium2>=4.30  # conversion PDF -> PNG
+Pillow>=10.0
