@@ -21,11 +21,17 @@ class MongoStorage:
     """Images dans MongoDB via GridFS — le defaut, et le plus simple."""
 
     def __init__(self):
-        from motor.motor_asyncio import AsyncIOMotorGridFSBucket
+        self._bucket = None  # cree a la premiere utilisation (bon event loop)
 
-        import db
+    @property
+    def bucket(self):
+        if self._bucket is None:
+            from motor.motor_asyncio import AsyncIOMotorGridFSBucket
 
-        self.bucket = AsyncIOMotorGridFSBucket(db.db)
+            import db
+
+            self._bucket = AsyncIOMotorGridFSBucket(db.database())
+        return self._bucket
 
     async def save(self, path: str, data: bytes) -> None:
         await self.bucket.upload_from_stream(path, data)

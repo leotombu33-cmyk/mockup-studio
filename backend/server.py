@@ -119,7 +119,7 @@ async def generate(file: UploadFile = File(...), scene_id: str = Form(...)):
         "created_at": datetime.now(timezone.utc).isoformat(),
         "is_deleted": False,
     }
-    await db.mockups.insert_one(dict(doc))
+    await db.mockups().insert_one(dict(doc))
 
     return serialize(doc)
 
@@ -127,13 +127,13 @@ async def generate(file: UploadFile = File(...), scene_id: str = Form(...)):
 @app.get("/api/mockups")
 async def list_mockups(limit: int = 50):
     limit = max(1, min(limit, 50))
-    cursor = db.mockups.find({"is_deleted": False}).sort("created_at", -1).limit(limit)
+    cursor = db.mockups().find({"is_deleted": False}).sort("created_at", -1).limit(limit)
     return [serialize(doc) async for doc in cursor]
 
 
 @app.get("/api/mockups/{mockup_id}/image")
 async def get_mockup_image(mockup_id: str):
-    doc = await db.mockups.find_one({"id": mockup_id, "is_deleted": False})
+    doc = await db.mockups().find_one({"id": mockup_id, "is_deleted": False})
     if doc is None:
         raise HTTPException(status_code=404, detail="not_found")
     try:
@@ -145,7 +145,7 @@ async def get_mockup_image(mockup_id: str):
 
 @app.delete("/api/mockups/{mockup_id}")
 async def delete_mockup(mockup_id: str):
-    result = await db.mockups.update_one(
+    result = await db.mockups().update_one(
         {"id": mockup_id, "is_deleted": False},
         {"$set": {"is_deleted": True}},
     )
